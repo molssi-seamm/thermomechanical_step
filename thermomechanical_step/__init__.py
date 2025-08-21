@@ -9,6 +9,7 @@ A SEAMM plug-in for calculating thermomechanical properties
 # the thermomechanical_step package.
 
 from .thermomechanical import Thermomechanical  # noqa: F401, E501
+from .thermomechanical_parameters import ThermomechanicalParameters  # noqa: F401, E501
 from .thermomechanical_step import ThermomechanicalStep  # noqa: F401, E501
 from .tk_thermomechanical import TkThermomechanical  # noqa: F401, E501
 

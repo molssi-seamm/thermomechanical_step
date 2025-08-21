@@ -3,12 +3,12 @@
 """The graphical part of a Thermomechanical step"""
 
 import pprint  # noqa: F401
-import tkinter as tk
+import tkinter.ttk as ttk
 
-import thermomechanical_step  # noqa: F401
+from .thermomechanical_parameters import ThermomechanicalParameters
 import seamm
 from seamm_util import ureg, Q_, units_class  # noqa: F401
-
+import seamm_widgets as sw
 
 
 class TkThermomechanical(seamm.TkNode):
@@ -47,7 +47,7 @@ class TkThermomechanical(seamm.TkNode):
         self,
         tk_flowchart=None,
         node=None,
-        namespace="org.molssi.seamm.thermomechanical.tk",
+        namespace="org.molssi.seamm.tk",
         canvas=None,
         x=None,
         y=None,
@@ -113,7 +113,7 @@ class TkThermomechanical(seamm.TkNode):
         TkThermomechanical.reset_dialog
         """
 
-        frame = super().create_dialog(title="Thermomechanical")
+        frame = super().create_dialog(title="Thermomechanical", widget="notebook")
         # make it large!
         screen_w = self.dialog.winfo_screenwidth()
         screen_h = self.dialog.winfo_screenheight()
@@ -124,12 +124,137 @@ class TkThermomechanical(seamm.TkNode):
 
         self.dialog.geometry(f"{w}x{h}+{x}+{y}")
 
+        # Add a frame for the flowchart
+        notebook = self["notebook"]
+        flowchart_frame = ttk.Frame(notebook)
+        self["flowchart frame"] = flowchart_frame
+        notebook.add(flowchart_frame, text="Flowchart", sticky="nsew")
+
         self.tk_subflowchart = seamm.TkFlowchart(
-            master=frame,
+            master=flowchart_frame,
             flowchart=self.node.subflowchart,
-            namespace=self.namespace
+            namespace=self.namespace,
         )
         self.tk_subflowchart.draw()
+
+        # Fill in the control parameters
+        # Shortcut for parameters
+        P = self.node.parameters
+
+        # thermomechanical frame to isolate widgets
+        frame = self["thermomechanical frame"] = ttk.LabelFrame(
+            self["frame"],
+            borderwidth=4,
+            relief="sunken",
+            text="Thermomechanical Parameters",
+            labelanchor="n",
+            padding=10,
+        )
+
+        for key in ThermomechanicalParameters.parameters:
+            if key not in ("results",):
+                self[key] = P[key].widget(frame)
+
+        # and binding to change as needed
+        for key in ("state point definition", "elastic constants"):
+            self[key].bind("<<ComboboxSelected>>", self.reset_thermomechanical_frame)
+            self[key].bind("<Return>", self.reset_thermomechanical_frame)
+            self[key].bind("<FocusOut>", self.reset_thermomechanical_frame)
+
+        # and lay them out
+        self.reset_dialog()
+
+        self.setup_results()
+
+    def reset_dialog(self, widget=None):
+        """Layout the widgets in the dialog.
+
+        The widgets are chosen by default from the information in
+        Thermomechanical parameters.
+
+        This function simply lays them out row by row with
+        aligned labels. You may wish a more complicated layout that
+        is controlled by values of some of the control parameters.
+        If so, edit or override this method
+
+        Parameters
+        ----------
+        widget : Tk Widget = None
+
+        Returns
+        -------
+        None
+
+        See Also
+        --------
+        TkThermomechanical.create_dialog
+        """
+
+        # Remove any widgets previously packed
+        frame = self["frame"]
+        for slave in frame.grid_slaves():
+            slave.grid_forget()
+
+        row = 0
+
+        self["thermomechanical frame"].grid(row=row, column=0, sticky="ew", pady=10)
+        row += 1
+        self.reset_thermomechanical_frame()
+
+        frame.columnconfigure(0, weight=1)
+
+        return row
+
+    def reset_thermomechanical_frame(self, widget=None):
+        """Layout the widgets in the thermomechanical frame
+        as needed for the current state"""
+
+        spdef = self["state point definition"].get()
+        elastic_constants = self["elastic constants"].get()
+
+        frame = self["thermomechanical frame"]
+        for slave in frame.grid_slaves():
+            slave.grid_forget()
+
+        # Main controls
+        row = 0
+        widgets = []
+        widgets1 = []
+        for key in ("state point definition",):
+            self[key].grid(row=row, column=0, columnspan=2, sticky="w")
+            widgets.append(self[key])
+            row += 1
+
+        if spdef == "as given":
+            keys = []
+        elif spdef == "list of P, T pairs":
+            keys = ["state points"]
+        else:
+            keys = ["P", "T"]
+        keys.append("elastic constants")
+        for key in keys:
+            self[key].grid(row=row, column=0, columnspan=2, sticky="ew")
+            widgets.append(self[key])
+            row += 1
+
+        if elastic_constants != "no":
+            for key in ("step size",):
+                self[key].grid(row=row, column=1, columnspan=1, sticky="ew")
+                widgets1.append(self[key])
+                row += 1
+
+        for key in (
+            "on success",
+            "on error",
+        ):
+            self[key].grid(row=row, column=0, columnspan=2, sticky="ew")
+            widgets.append(self[key])
+            row += 1
+
+        w0 = sw.align_labels(widgets, sticky="e")
+        w1 = sw.align_labels(widgets1, sticky="e")
+        frame.columnconfigure(0, minsize=w0 - w1 + 50)
+        frame.columnconfigure(1, weight=1)
 
     def right_click(self, event):
         """

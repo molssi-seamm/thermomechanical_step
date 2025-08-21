@@ -32,8 +32,8 @@ class ThermomechanicalStep(object):
     """
 
     my_description = {
-        "description": "An interface for Thermomechanical",
-        "group": "Simulations",
+        "description": "An interface for calculating thermomechanical properties",
+        "group": "Properties",
         "name": "Thermomechanical",
     }
 

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""This file contains metadata describing the results from Thermomechanical
-"""
+"""This file contains metadata describing the results from Thermomechanical step"""
 
 metadata = {}
 
@@ -131,16 +130,139 @@ type : str
 units : str
     Optional units for the result. If present, the value should be in these units.
 """
-# metadata["results"] = {
-#     "total_energy": {
-#         "calculation": [
-#             "energy",
-#             "optimization",
-#         ],
-#         "description": "The total energy",
-#         "dimensionality": "scalar",
-#         "property": "total energy#Thermomechanical#{model}",
-#         "type": "float",
-#         "units": "E_h",
-#     },
-# }
+metadata["results"] = {
+    "P": {
+        "description": "Pressure",
+        "dimensionality": "[nPs]",
+        "property": "P#Thermomechanical#{model}",
+        "type": "float",
+        "units": "atm",
+        "format": ".2f",
+    },
+    "T": {
+        "description": "Temperature",
+        "dimensionality": "[nTs]",
+        "property": "T#Thermomechanical#{model}",
+        "type": "float",
+        "units": "K",
+        "format": ".2f",
+    },
+    "alpha(V)": {
+        "description": "volumetric coefficient of thermal expansion",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "1/K",
+        "format": ".2g",
+    },
+    "alpha(a)": {
+        "description": "linear coefficient of thermal expansion in cell a",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "1/K",
+        "format": ".2g",
+    },
+    "alpha(b)": {
+        "description": "linear coefficient of thermal expansion in cell b",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "1/K",
+        "format": ".2g",
+    },
+    "alpha(c)": {
+        "description": "linear coefficient of thermal expansion in cell c",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "1/K",
+        "format": ".2g",
+    },
+    "stress": {
+        "description": "stress",
+        "dimensionality": "[6]",
+        "type": "float",
+        "units": "GPa",
+    },
+    "Cij": {
+        "description": "elastic constants",
+        "dimensionality": "[6][6]",
+        "type": "float",
+        "units": "GPa",
+    },
+    "Sij": {
+        "description": "compliance matrix",
+        "dimensionality": "[6][6]",
+        "type": "float",
+        "units": "1/GPa",
+    },
+    "Kv": {
+        "description": "Voigt bulk modulus",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "GPa",
+    },
+    "Gv": {
+        "description": "Voigt shear modulus",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "GPa",
+    },
+    "Ev": {
+        "description": "Voigt Young modulus",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "GPa",
+    },
+    "mu_v": {
+        "description": "Voigt Poisson ratio",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "GPa",
+    },
+    "Kr": {
+        "description": "Reuss bulk modulus",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "GPa",
+    },
+    "Gr": {
+        "description": "Reuss shear modulus",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "GPa",
+    },
+    "Er": {
+        "description": "Reuss Young modulus",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "GPa",
+    },
+    "mu_r": {
+        "description": "Reuss Poisson ratio",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "GPa",
+    },
+    "Kh": {
+        "description": "Hill bulk modulus",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "GPa",
+    },
+    "Gh": {
+        "description": "Hill shear modulus",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "GPa",
+    },
+    "Eh": {
+        "description": "Hill Young modulus",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "GPa",
+    },
+    "mu_h": {
+        "description": "Hill Poisson ratio",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "GPa",
+    },
+}

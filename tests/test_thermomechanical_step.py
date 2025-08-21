@@ -10,4 +10,7 @@ import thermomechanical_step  # noqa: F401
 def test_construction():
     """Just create an object and test its type."""
     result = thermomechanical_step.Thermomechanical()
-    assert str(type(result)) == "<class 'thermomechanical_step.thermomechanical.Thermomechanical'>"
+    assert (
+        str(type(result))
+        == "<class 'thermomechanical_step.thermomechanical.Thermomechanical'>"
+    )
