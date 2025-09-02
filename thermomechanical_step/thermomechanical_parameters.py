@@ -128,6 +128,15 @@ class ThermomechanicalParameters(seamm.Parameters):
             "description": "Strain step:",
             "help_text": "The size of the step in strain for elastic constants.",
         },
+        "thermochemistry Ts": {
+            "default": "1:10,20:100:10,125:275:25,298.15,300:1000:50,1100:3000:100",
+            "kind": "string",
+            "default_units": "K",
+            "enumeration": tuple(),
+            "format_string": "",
+            "description": "Temperatures for thermochemistry:",
+            "help_text": "The temperatures for the thermochemistryproperties.",
+        },
         "on success": {
             "default": "keep last subdirectory",
             "kind": "enum",
