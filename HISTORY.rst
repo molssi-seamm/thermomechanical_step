@@ -1,6 +1,10 @@
 =======
 History
 =======
+2025.9.4 -- Bugfixes: numerical issues and missing item in the GUI
+    * Fixed numerical overflows that occurred for larger Debye temperature, > ~700 K
+    * The list of temperatures for the thermochemistry functions was missing in the GUI.
+
 2025.9.2 -- Added several properties and thermodynamic functions to the output
     * Added a table of properties from the Debye model as well as ability to save/store
       them

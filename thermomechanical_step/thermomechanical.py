@@ -484,7 +484,7 @@ class Thermomechanical(seamm.Node):
         text = "The zero-point energy above and thermodynamic functions below "
         text += f"correspond to the empirical formula {empirical_formula}."
         if Z > 1:
-            text += f" There are {Z} units of that formula in the cell."
+            text += f", of which there are {Z} units in the cell."
         printer.normal(__(text, indent=self.indent + 4 * " "))
         printer.normal("")
 
@@ -1009,9 +1009,6 @@ class Thermomechanical(seamm.Node):
         Tmin = min(Ts)
         Tmax = max(Ts)
 
-        # for T in Ts[::-1]:
-        #     print(f"{T:9.2f} {Td / T:9.4f}")
-
         # Bootstrap the integral in one degree increments from Tmax + 2 to Tmin - 1 or 0
         U_sum = 0
         Cv_sum = 0
@@ -1040,20 +1037,18 @@ class Thermomechanical(seamm.Node):
                             (xm**3 / (exp(xm) - 1) + xp**3 / (exp(xp) - 1)) / 2 * step
                         )
                     except OverflowError:
-                        print(f"U_int overflowed: {T=} {x=}")
                         U_sum = pi**4 / 15
 
                     try:
                         Cv_sum += (
                             (
-                                xm**4 * exp(xm) / (exp(xm) - 1) / (exp(xm) - 1)
-                                + xm**4 * exp(xp) / (exp(xp) - 1) / (exp(xp) - 1)
+                                xm**4 * (exp(xm) / (exp(xm) - 1)) / (exp(xm) - 1)
+                                + xm**4 * (exp(xp) / (exp(xp) - 1)) / (exp(xp) - 1)
                             )
                             / 2
                             * step
                         )
                     except OverflowError:
-                        print(f"Cv_int overflowed: {T=} {x=}")
                         Cv_sum = 4 * pi**4 / 15
                 x += step
             xmin = xmax
@@ -1066,7 +1061,11 @@ class Thermomechanical(seamm.Node):
         S_sum = Cv1[T + 1] / (T + 1) / 2
         S1[1] = S_sum
         for T in range(2, Tmax + 2):
-            S_sum += (Cv1[T - 1] / (T - 1) + Cv1[T + 1] / (T + 1)) / 2
+            if T <= 10:
+                # Use asymptotic formula
+                S_sum = Cv1[T] / 3
+            else:
+                S_sum += (Cv1[T - 1] / (T - 1) + Cv1[T + 1] / (T + 1)) / 2
             S1[T] = S_sum
 
         # Now find the desired values
@@ -1079,44 +1078,16 @@ class Thermomechanical(seamm.Node):
             Tp = Tm + 1
 
             value = U1[Tm] + (U1[Tp] - U1[Tm]) * (T - Tm)
-            decimals = int(log10(value))
-            if decimals < 0:
-                decimals = -decimals + 3
-            else:
-                decimals = 2 - decimals
-                if decimals < 0:
-                    decimals = 0
-            U.append(round(value, decimals))
+            U.append(round_value(value))
 
             value = Cv1[Tm] + (Cv1[Tp] - Cv1[Tm]) * (T - Tm)
-            decimals = int(log10(value))
-            if decimals < 0:
-                decimals = -decimals + 3
-            else:
-                decimals = 2 - decimals
-                if decimals < 0:
-                    decimals = 0
-            Cv.append(round(value, decimals))
+            Cv.append(round_value(value))
 
             value = S1[Tm] + (S1[Tp] - S1[Tm]) * (T - Tm)
-            decimals = int(log10(value))
-            if decimals < 0:
-                decimals = -decimals + 3
-            else:
-                decimals = 2 - decimals
-                if decimals < 0:
-                    decimals = 0
-            S.append(round(value, decimals))
+            S.append(round_value(value))
 
             value = U[-1] - T * S[-1] / 1000  # kJ/mol, not J/mol
-            decimals = int(log10(abs(value)))
-            if decimals < 0:
-                decimals = -decimals + 3
-            else:
-                decimals = 2 - decimals
-                if decimals < 0:
-                    decimals = 0
-            Ehelmholtz.append(round(value, decimals))
+            Ehelmholtz.append(round_value(value))
 
         # The fit equation
         #
@@ -1136,56 +1107,91 @@ class Thermomechanical(seamm.Node):
         for T in Ts:
             x = T / Td
 
-            eAx = [exp(A[0] / x), exp(A[1] / x)]
-            Cx2 = [C[0] ** 2 + x**2, C[1] ** 2 + x**2, C[2] ** 2 + x**2]
+            try:
+                eAx = [exp(A[0] / x), exp(A[1] / x)]
+                Cx2 = [C[0] ** 2 + x**2, C[1] ** 2 + x**2, C[2] ** 2 + x**2]
 
-            # Cv
-            tmp1 = 0
-            for i in range(2):
-                tmp1 += (A[i] / x) ** 2 * eAx[i] / (eAx[i] - 1) / (eAx[i] - 1)
-            tmp1 /= 2
+                # Cv
+                tmp1 = 0
+                for i in range(2):
+                    tmp1 += (A[i] / x) ** 2 * eAx[i] / (eAx[i] - 1) / (eAx[i] - 1)
+                tmp1 /= 2
 
-            tmp2 = 0
-            for i in range(3):
-                tmp2 += B[i] / Cx2[i] ** ni[i]
-            tmp2 *= x**3
+                tmp2 = 0
+                for i in range(3):
+                    tmp2 += B[i] / Cx2[i] ** ni[i]
+                tmp2 *= x**3
 
-            value = 3 * N * R * (tmp1 + tmp2)
-            Cv_fit.append(round(value, decimals))
+                value = 3 * N * R * (tmp1 + tmp2)
+                Cv_fit.append(round_value(value))
 
-            # U
-            tmp = 0
-            for i in range(2):
-                tmp += A[i] / (eAx[i] - 1) + B[i] * (
-                    log(1 + x**2 / C[i] ** 2) - x**2 / Cx2[i]
-                )
-            tmp /= 2 * x
-            tmp += B[2] / (4 * C[2] ** 2) * x**3 / Cx2[2] ** 2
+                # U
+                tmp = 0
+                for i in range(2):
+                    tmp += A[i] / (eAx[i] - 1) + B[i] * (
+                        log(1 + x**2 / C[i] ** 2) - x**2 / Cx2[i]
+                    )
+                tmp /= 2 * x
+                tmp += B[2] / (4 * C[2] ** 2) * x**3 / Cx2[2] ** 2
 
-            U_fit.append(3 * N * R * T * tmp / 1000)  # kJ/mol, not J/mol
+                U_fit.append(3 * N * R * T * tmp / 1000)  # kJ/mol, not J/mol
 
-            # S
-            tmp = 0
-            for i in range(2):
+                # S
+                tmp = 0
+                for i in range(2):
+                    tmp += (
+                        A[i] / x * eAx[i] / (eAx[i] - 1)
+                        - log(eAx[i] - 1)
+                        + B[i] * (atan(x / C[i]) / C[i] - x / (C[i] ** 2 + x**2))
+                    ) / 2
                 tmp += (
-                    A[i] / x * eAx[i] / (eAx[i] - 1)
-                    - log(eAx[i] - 1)
-                    + B[i] * (atan(x / C[i]) / C[i] - x / (C[i] ** 2 + x**2))
-                ) / 2
-            tmp += (
-                B[2]
-                / (8 * C[2] ** 2)
-                * (
-                    (x**3 - C[2] ** 2 * x) / (C[2] ** 2 + x**2) ** 2
-                    + atan(x / C[2]) / C[2]
+                    B[2]
+                    / (8 * C[2] ** 2)
+                    * (
+                        (x**3 - C[2] ** 2 * x) / (C[2] ** 2 + x**2) ** 2
+                        + atan(x / C[2]) / C[2]
+                    )
                 )
-            )
 
-            value = 3 * N * R * tmp
-            S_fit.append(round_value(value))
+                value = 3 * N * R * tmp
+                S_fit.append(round_value(value))
 
-            value = U_fit[-1] - T * S_fit[-1] / 1000  # kJ/mol, not J/mol
-            A_fit.append(round_value(value))
+                value = U_fit[-1] - T * S_fit[-1] / 1000  # kJ/mol, not J/mol
+                A_fit.append(round_value(value))
+            except OverflowError:
+                value = 12 * pi**4 * N * R * x**3 / 5
+                Cv_fit.append(round_value(value))
+                value = 3 * pi**4 * N * R * T * x**3 / 5 / 1000  # kJ
+                U_fit.append(round_value(value))
+                value = Cv_fit[-1] / 3
+                S_fit.append(round_value(value))
+                value = U_fit[-1] - T * S_fit[-1] / 1000  # kJ/mol, not J/mol
+                A_fit.append(round_value(value))
+
+        # What is the maximum error of fit vs integral?
+        if False:
+            max_error = 0
+            for T, v0, v in zip(Ts, Cv, Cv_fit):
+                tmp = (v - v0) / v0
+                if abs(tmp) > abs(max_error):
+                    max_error = tmp
+            print(f"Maximum relative error in Cv fit is {max_error}")
+
+            max_error = 0
+            for v0, v in zip(U, U_fit):
+                tmp = (v - v0) / v0
+                if abs(tmp) > abs(max_error):
+                    max_error = tmp
+            print(f"Maximum relative error in U fit is {max_error}")
+
+            max_error = 0
+            for T, v0, v in zip(Ts, S, S_fit):
+                tmp = (v - v0) / v0
+                if abs(tmp) > 0.1:
+                    print(f"\t{T} {v0} {v}")
+                if abs(tmp) > abs(max_error):
+                    max_error = tmp
+            print(f"Maximum relative error in S fit is {max_error}")
 
         return {
             "Cv": Cv,

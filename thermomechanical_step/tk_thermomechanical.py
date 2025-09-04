@@ -238,7 +238,7 @@ class TkThermomechanical(seamm.TkNode):
             row += 1
 
         if elastic_constants != "no":
-            for key in ("step size",):
+            for key in ("step size", "thermochemistry Ts"):
                 self[key].grid(row=row, column=1, columnspan=1, sticky="ew")
                 widgets1.append(self[key])
                 row += 1
