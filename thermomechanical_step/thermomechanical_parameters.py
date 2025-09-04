@@ -131,11 +131,11 @@ class ThermomechanicalParameters(seamm.Parameters):
         "thermochemistry Ts": {
             "default": "1:10,20:100:10,125:275:25,298.15,300:1000:50,1100:3000:100",
             "kind": "string",
-            "default_units": "K",
+            "default_units": "",
             "enumeration": tuple(),
             "format_string": "",
-            "description": "Temperatures for thermochemistry:",
-            "help_text": "The temperatures for the thermochemistryproperties.",
+            "description": "Temperatures for thermochemistry (K):",
+            "help_text": "The temperatures for the thermochemistry properties.",
         },
         "on success": {
             "default": "keep last subdirectory",
