@@ -1,6 +1,9 @@
 =======
 History
 =======
+2025.9.6 -- Bugfix: error in units for Poisson ratio
+    * Corrected the metadata to indicate that the Poisson ratio has no units.
+
 2025.9.4 -- Bugfixes: numerical issues and missing item in the GUI
     * Fixed numerical overflows that occurred for larger Debye temperature, > ~700 K
     * The list of temperatures for the thermochemistry functions was missing in the GUI.
