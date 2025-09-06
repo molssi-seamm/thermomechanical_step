@@ -215,7 +215,7 @@ metadata["results"] = {
         "description": "Voigt Poisson ratio",
         "dimensionality": "scalar",
         "type": "float",
-        "units": "GPa",
+        "units": "",
     },
     "Kr": {
         "description": "Reuss bulk modulus",
@@ -239,7 +239,7 @@ metadata["results"] = {
         "description": "Reuss Poisson ratio",
         "dimensionality": "scalar",
         "type": "float",
-        "units": "GPa",
+        "units": "",
     },
     "Kh": {
         "description": "Hill bulk modulus",
@@ -267,7 +267,7 @@ metadata["results"] = {
         "dimensionality": "scalar",
         "property": "Poisson ratio#Thermomechanical#{model}",
         "type": "float",
-        "units": "GPa",
+        "units": "",
     },
     "vt": {
         "description": "transverse sound velocity",
