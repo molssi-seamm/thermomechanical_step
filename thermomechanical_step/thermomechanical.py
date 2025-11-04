@@ -201,7 +201,6 @@ class Thermomechanical(seamm.Node):
                 units = results[0]["Sxx,units"]
                 factor = Q_(1.0, units).m_as("GPa")
             else:
-                units = "GPa"
                 factor = 1
             # Save the stress
             data["stress"] = [

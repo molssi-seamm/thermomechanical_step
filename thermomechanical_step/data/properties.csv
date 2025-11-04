@@ -1,5 +1,5 @@
 Property,Type,Units,Description,URL
-"A - U0#Thermomechanical#{model}",float,kJ/mol,"Helmoltz free energy",https://en.wikipedia.org/wiki/Helmholtz_free_energy
+"A - U0#Thermomechanical#{model}",float,kJ/mol,"Helmholtz free energy",https://en.wikipedia.org/wiki/Helmholtz_free_energy
 "Cv#Thermomechanical#{model}",float,J/mol/K,"Constant volume heat capacity",https://en.wikipedia.org/wiki/Heat_capacity
 "Debye temperature#Thermomechanical#{model}",float,K,"The Debye temperature",https://en.wikipedia.org/wiki/Debye_model
 "Gruneisen parameter#Thermomechanical#{model}",float,,"Gruneisen parameter",https://en.wikipedia.org/wiki/Grüneisen_parameter
