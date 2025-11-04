@@ -187,19 +187,26 @@ class Thermomechanical(seamm.Node):
         configuration.cell.parameters = cell0
         configuration.coordinates = fractionals0
 
-        # Find the units of the stress
-        if "Sxx,units" in results[0]:
-            units = results[0]["Sxx,units"]
-            factor = Q_(1.0, units).m_as("GPa")
+        # The stress may be a 6-vector or the six elements
+        if "stress" in results[0]:
+            units = results[0]["stress,units"]
+            if units == "GPa":
+                factor = 1
+                data["stress"] = results[0]["stress"]
+            else:
+                factor = Q_(1.0, units).m_as("GPa")
+                data["stress"] = [v * factor for v in results[0]["stress"]]
         else:
-            units = "GPa"
-            factor = 1
-
-        # Save the stress
-        data["stress"] = [
-            results[0][key] * factor
-            for key in ("Sxx", "Syy", "Szz", "Syz", "Sxz", "Sxy")
-        ]
+            if "Sxx,units" in results[0]:
+                units = results[0]["Sxx,units"]
+                factor = Q_(1.0, units).m_as("GPa")
+            else:
+                factor = 1
+            # Save the stress
+            data["stress"] = [
+                results[0][key] * factor
+                for key in ("Sxx", "Syy", "Szz", "Syz", "Sxz", "Sxy")
+            ]
 
         # And the strains, + & -
         step = _P["step size"]
@@ -231,9 +238,15 @@ class Thermomechanical(seamm.Node):
             plus = results[(i, "+")]
             minus = results[(i, "-")]
             row = []
-            for j, strain in enumerate(("Sxx", "Syy", "Szz", "Syz", "Sxz", "Sxy")):
-                Cij = factor * (plus[strain] - minus[strain]) / (2 * step)
-                row.append(Cij)
+            if "stress" in plus:
+                row = [
+                    factor * (p - m) / (2 * step)
+                    for p, m in zip(plus["stress"], minus["stress"])
+                ]
+            else:
+                for j, strain in enumerate(("Sxx", "Syy", "Szz", "Syz", "Sxz", "Sxy")):
+                    Cij = factor * (plus[strain] - minus[strain]) / (2 * step)
+                    row.append(Cij)
             C.append(row)
 
         # Print the unsymmetrized matrix

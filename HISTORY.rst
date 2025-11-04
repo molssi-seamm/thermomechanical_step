@@ -1,6 +1,11 @@
 =======
 History
 =======
+2025.11.4 -- Enhancement to stresses & bugfix.
+    * Enhanced the code to allow using with the six independent stresses (Sxx, ...) for
+      the subflowchart or stresses as a 6-vector.
+    * Fixed two problems with inconsistent naming of properties to store in the database.
+      
 2025.9.6 -- Bugfix: error in units for Poisson ratio
     * Corrected the metadata to indicate that the Poisson ratio has no units.
 
