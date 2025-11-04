@@ -307,7 +307,7 @@ metadata["results"] = {
     "Pcauchy": {
         "description": "Cauchy pressure",
         "dimensionality": "scalar",
-        "property": "Cauchy pressure#Thermomechanical#{model}",
+        "property": "Pcauchy#Thermomechanical#{model}",
         "type": "float",
         "units": "GPa",
     },
@@ -356,7 +356,7 @@ metadata["results"] = {
     "A - U0": {
         "description": "Helmholtz free energy",
         "dimensionality": "nTs",
-        "property": "A#Thermomechanical#{model}",
+        "property": "A - U0#Thermomechanical#{model}",
         "type": "json",
         "units": "kJ/mol",
     },
