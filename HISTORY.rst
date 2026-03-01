@@ -1,6 +1,8 @@
 =======
 History
 =======
+2026.3.1 -- Internal: switching from deprecated library pkg_resources to importlib
+
 2025.11.4 -- Enhancement to stresses & bugfix.
     * Enhanced the code to allow using with the six independent stresses (Sxx, ...) for
       the subflowchart or stresses as a 6-vector.

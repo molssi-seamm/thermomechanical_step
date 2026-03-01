@@ -3,11 +3,10 @@
 """Non-graphical part of the Thermomechanical step in a SEAMM flowchart"""
 
 from datetime import datetime
+import importlib
 import json
 import logging
 from math import exp, log, log10, atan
-from pathlib import Path
-import pkg_resources
 import pprint  # noqa: F401
 import shlex
 import sys
@@ -37,7 +36,7 @@ job = printing.getPrinter()
 printer = printing.getPrinter("Thermomechanical")
 
 # Add this module's properties to the standard properties
-path = Path(pkg_resources.resource_filename(__name__, "data/"))
+path = importlib.resources.files("thermomechanical_step") / "data"
 csv_file = path / "properties.csv"
 if path.exists():
     molsystem.add_properties_from_file(csv_file)
